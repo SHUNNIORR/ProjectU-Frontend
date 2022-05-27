@@ -1,6 +1,6 @@
 import { useState, useEffect, createContext } from 'react'
 import { useNavigate } from 'react-router-dom'
-import clienteAxios from '../config/clienteAxios';
+import {clienteAxios} from '../config/clienteAxios';
 
 const AuthContext = createContext();
 

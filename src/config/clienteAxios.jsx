@@ -1,7 +1,13 @@
 import axios from 'axios'
 
-const clienteAxios = axios.create({
+export const clienteAxios = axios.create({
     baseURL:`http://localhost:4000/api`
 })
 
-export default clienteAxios;
+export const clienteAxiosProyectos = axios.create({
+    baseURL:`http://localhost:4001/api`
+})
+export const clienteAxiosTarea = axios.create({
+    baseURL:`http://localhost:4002/api`
+})
+

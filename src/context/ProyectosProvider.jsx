@@ -1,5 +1,5 @@
 import { useState, useEffect, createContext } from 'react'
-import clienteAxios from '../config/clienteAxios'
+import { clienteAxiosProyectos, clienteAxiosTarea } from '../config/clienteAxios'
 import { useNavigate } from 'react-router-dom'
 import useAuth from '../hooks/useAuth'
 import io from 'socket.io-client'
@@ -37,7 +37,7 @@ const ProyectosProvider = ({children}) => {
                         Authorization: `Bearer ${token}`
                     }
                 }
-                const { data } = await clienteAxios('/proyectos', config)
+                const { data } = await clienteAxiosProyectos('/proyectos', config)
                 setProyectos(data)
             } catch (error) {
                 console.log(error)
@@ -78,7 +78,7 @@ const ProyectosProvider = ({children}) => {
                 }
             }
 
-            const { data } = await clienteAxios.put(`/proyectos/${proyecto.id}`, proyecto, config)
+            const { data } = await clienteAxiosProyectos.put(`/proyectos/${proyecto.id}`, proyecto, config)
 
             // Sincronizar el state
             const proyectosActualizados = proyectos.map(proyectoState => proyectoState._id === data._id ? data : proyectoState)
@@ -110,7 +110,7 @@ const ProyectosProvider = ({children}) => {
                 }
             }
 
-            const { data } = await clienteAxios.post('/proyectos', proyecto, config)
+            const { data } = await clienteAxiosProyectos.post('/proyectos', proyecto, config)
 
             setProyectos([...proyectos, data])
 
@@ -141,7 +141,7 @@ const ProyectosProvider = ({children}) => {
                 }
             }
 
-            const { data } = await clienteAxios(`/proyectos/${id}`, config )
+            const { data } = await clienteAxiosProyectos(`/proyectos/${id}`, config )
             setProyecto(data)
             setAlerta({})
         } catch (error) {
@@ -170,7 +170,7 @@ const ProyectosProvider = ({children}) => {
                 }
             }
 
-            const { data } = await clienteAxios.delete(`/proyectos/${id}`, config)
+            const { data } = await clienteAxiosProyectos.delete(`/proyectos/${id}`, config)
 
             // Sincronizar el state
             const proyectosActualizados = proyectos.filter(proyectoState => proyectoState._id !== id )
@@ -215,7 +215,7 @@ const ProyectosProvider = ({children}) => {
                 }
             }
 
-            const { data } = await clienteAxios.post('/tareas', tarea, config)
+            const { data } = await clienteAxiosTarea.post('/tareas', tarea, config)
 
             setAlerta({})
             setModalFormularioTarea(false)
@@ -239,7 +239,7 @@ const ProyectosProvider = ({children}) => {
                 }
             }
 
-            const { data } = await clienteAxios.put(`/tareas/${tarea.id}`, tarea, config)
+            const { data } = await clienteAxiosTarea.put(`/tareas/${tarea.id}`, tarea, config)
             
             setAlerta({})
             setModalFormularioTarea(false)
@@ -274,7 +274,7 @@ const ProyectosProvider = ({children}) => {
                 }
             }
 
-            const { data } = await clienteAxios.delete(`/tareas/${tarea._id}`, config)
+            const { data } = await clienteAxiosTarea.delete(`/tareas/${tarea._id}`, config)
             setAlerta({
                 msg: data.msg,
                 error: false
@@ -309,7 +309,7 @@ const ProyectosProvider = ({children}) => {
                 }
             }
 
-            const { data } = await clienteAxios.post('/proyectos/colaboradores', {email}, config)
+            const { data } = await clienteAxiosProyectos.post('/proyectos/colaboradores', {email}, config)
 
             setColaborador(data)
             setAlerta({})
@@ -320,6 +320,38 @@ const ProyectosProvider = ({children}) => {
             })
         } finally {
             setCargando(false)
+        }
+    }
+
+    const agregarResponsabledeTarea = async ({email,tareaId}) => {
+        console.log('desde funcion',tareaId)
+        try {
+            const token = localStorage.getItem('token')
+            if(!token) return
+
+            const config = {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                }
+            }
+            const { data } = await clienteAxiosTarea.post(`/tareas/asignarResponsable/${tareaId}`, email, config)
+
+            setAlerta({
+                msg: data.msg,
+                error: false
+            })
+            setColaborador({})
+
+            setTimeout(() => {
+                setAlerta({})
+            }, 3000);
+
+        } catch (error) {
+           setAlerta({
+               msg: error.response.data.msg,
+               error: true
+           })
         }
     }
 
@@ -335,7 +367,7 @@ const ProyectosProvider = ({children}) => {
                     Authorization: `Bearer ${token}`
                 }
             }
-            const { data } = await clienteAxios.post(`/proyectos/colaboradores/${proyecto._id}`, email, config)
+            const { data } = await clienteAxiosProyectos.post(`/proyectos/colaboradores/${proyecto._id}`, email, config)
 
             setAlerta({
                 msg: data.msg,
@@ -371,7 +403,7 @@ const ProyectosProvider = ({children}) => {
                     Authorization: `Bearer ${token}`
                 }
             }
-            const { data } = await clienteAxios.post(`/proyectos/eliminar-colaborador/${proyecto._id}`, { id: colaborador._id }, config)
+            const { data } = await clienteAxiosProyectos.post(`/proyectos/eliminar-colaborador/${proyecto._id}`, { id: colaborador._id }, config)
 
             const proyectoActualizado = {...proyecto}
 
@@ -405,7 +437,7 @@ const ProyectosProvider = ({children}) => {
                     Authorization: `Bearer ${token}`
                 }
             }
-            const { data } = await clienteAxios.post(`/tareas/estado/${id}`, {}, config)
+            const { data } = await clienteAxiosTarea.post(`/tareas/estado/${id}`, {}, config)
             setTarea({})
             setAlerta({})
 
@@ -475,6 +507,7 @@ const ProyectosProvider = ({children}) => {
                 eliminarTarea,
                 submitColaborador,
                 colaborador,
+                agregarResponsabledeTarea,
                 agregarColaborador,
                 handleModalEliminarColaborador,
                 modalEliminarColaborador,

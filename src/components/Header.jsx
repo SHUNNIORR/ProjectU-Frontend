@@ -32,6 +32,10 @@ const Header = () => {
                     to="/proyectos"
                     className='font-bold uppercase'
                 >Proyectos</Link>
+                <Link
+                    to="/administracion"
+                    className='font-bold uppercase'
+                >Administración</Link>
 
                 <button
                     type="button"
