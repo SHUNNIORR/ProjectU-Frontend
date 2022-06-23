@@ -20,6 +20,8 @@ const ProyectosProvider = ({children}) => {
     const [ colaborador, setColaborador] = useState({})
     const [ modalEliminarColaborador, setModalEliminarColaborador] = useState(false)
     const [ buscador, setBuscador] = useState(false)
+    const [tareaPorUsuario, setTareaPorUsuario] = useState([]);
+    const [tareaPorFecha, setTareaPorFecha] = useState([]);
 
     const navigate = useNavigate();
     const { auth } = useAuth()
@@ -325,6 +327,9 @@ const ProyectosProvider = ({children}) => {
 
     const agregarResponsabledeTarea = async ({email,tareaId}) => {
         console.log('desde funcion',tareaId)
+        /*
+        
+        */ 
         try {
             const token = localStorage.getItem('token')
             if(!token) return
@@ -335,7 +340,7 @@ const ProyectosProvider = ({children}) => {
                     Authorization: `Bearer ${token}`
                 }
             }
-            const { data } = await clienteAxiosTarea.post(`/tareas/asignarResponsable/${tareaId}`, email, config)
+            const { data } = await clienteAxiosTarea.post(`/tareas/asignarResponsable/${tareaId}`, {email}, config)
 
             setAlerta({
                 msg: data.msg,
@@ -355,10 +360,94 @@ const ProyectosProvider = ({children}) => {
         }
     }
 
+    const obtenerTareasPorUsuario = async ({userId,fechainicio,fechafin}) => {
+        console.log('desde funcion tareasx usuario',userId)
+        /*
+        
+        */ 
+        try {
+            const token = localStorage.getItem('token')
+            if(!token) return
+
+            const config = {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                }
+            }
+            const { data } = await clienteAxiosTarea.get(`/tareas/usuario/${userId}`, config)
+
+            
+            console.log('respuesta del back',data)
+
+            setTareaPorUsuario(data)
+
+            setAlerta({
+                msg: data.msg,
+                error: false
+            })
+
+            setTimeout(() => {
+                setAlerta({})
+            }, 3000);
+
+            return data
+
+        } catch (error) {
+           setAlerta({
+               msg: error.response.data.msg,
+               error: true
+           })
+        }
+    }
+
+    const filtrarTareasPorFecha = async (userId,fechainicio,fechafin) => {
+        console.log('desde funcion tareasx usuario',userId)
+        /*
+        
+        */ 
+        try {
+            const token = localStorage.getItem('token')
+            if(!token) return
+
+            const config = {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                }
+            }
+            const { data } = await clienteAxiosTarea.post(`/tareas/usuario/${userId}`,{"fechainicial":fechainicio,"fechafinal":fechafin}, config)
+
+            
+            console.log('respuesta del back por fechas',data)
+
+            setTareaPorFecha(data)
+
+            setAlerta({
+                msg: data.msg,
+                error: false
+            })
+
+            setTimeout(() => {
+                setAlerta({})
+            }, 3000);
+
+            return data
+
+        } catch (error) {
+           setAlerta({
+               msg: error.response.data.msg,
+               error: true
+           })
+        }
+    }
+
     const agregarColaborador = async email => {
 
         try {
             const token = localStorage.getItem('token')
+
+            console.log('TOKEN*****', token)
             if(!token) return
 
             const config = {
@@ -450,6 +539,8 @@ const ProyectosProvider = ({children}) => {
         
     }
 
+
+
     const handleBuscador = () => {
         setBuscador(!buscador)
     }
@@ -489,7 +580,9 @@ const ProyectosProvider = ({children}) => {
     return (
         <ProyectosContext.Provider
             value={{
+                tareaPorFecha,
                 proyectos,
+                tareaPorUsuario,
                 mostrarAlerta,
                 alerta,
                 submitProyecto,
@@ -508,6 +601,7 @@ const ProyectosProvider = ({children}) => {
                 submitColaborador,
                 colaborador,
                 agregarResponsabledeTarea,
+                obtenerTareasPorUsuario,
                 agregarColaborador,
                 handleModalEliminarColaborador,
                 modalEliminarColaborador,
@@ -519,7 +613,8 @@ const ProyectosProvider = ({children}) => {
                 eliminarTareaProyecto,
                 actualizarTareaProyecto,
                 cambiarEstadoTarea,
-                cerrarSesionProyectos
+                cerrarSesionProyectos,
+                filtrarTareasPorFecha
             }}
         >{children}
         </ProyectosContext.Provider>

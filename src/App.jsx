@@ -46,7 +46,7 @@ function App() {
                   <Route path=":id" element={<Proyecto />} />
                   <Route path="editar/:id" element={<EditarProyecto />} />
               </Route>
-              <Route path="/administracion" element={<RutaProtegida />}>
+              <Route path="/administracion/:id" element={<RutaProtegida />}>
                 <Route index element={<Administracion />} />
               </Route>
           </Routes>

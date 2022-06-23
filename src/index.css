@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.textAdministrationTitle{
+    font-size: 30px;
+}
+
+.button-subirArchivo:disabled{
+    background-color: rgb(40, 40, 40);
+    cursor: not-allowed;
+    text-decoration-line:line-through ;
+}
